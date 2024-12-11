@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Data gejala
+# Data gejala yang dapat dipilih oleh pengguna
 symptoms_data = {
     'P001': 'P001 : Nyeri dada',
     'P002': 'P002 : Bahu kiri terasa tidak enak',
@@ -28,7 +28,7 @@ symptoms_data = {
     'P024': 'P024 : Sakit Kepala'
 }
 
-# Data diagnosis
+# Data diagnosis berdasarkan aturan yang ada
 diagnosis_data = {
     'R01': 'Penyakit Jantung Koroner',
     'R02': 'Penyakit Otot Jantung (Kardiomiopati)',
@@ -39,7 +39,7 @@ diagnosis_data = {
     'R07': 'Kardiomegali atau Hipertrofi'
 }
 
-# Aturan gejala untuk setiap rule
+# Aturan gejala yang digunakan untuk mendiagnosis penyakit
 rule_data = {
     'R01': ['P001', 'P002', 'P003', 'P004', 'P005', 'P006', 'P007', 'P023', 'P024'],
     'R02': ['P004', 'P007', 'P008', 'P009', 'P010', 'P011'],
@@ -50,18 +50,19 @@ rule_data = {
     'R07': ['P001', 'P007', 'P020', 'P021']
 }
 
-# Fungsi untuk diagnosis
+# Fungsi untuk melakukan diagnosis berdasarkan gejala yang dipilih
 def diagnose_heart_disease(selected_symptoms):
+    # Memeriksa setiap aturan dan mencocokkan gejala dengan diagnosis yang sesuai
     for rule, symptoms in rule_data.items():
-        if all(symptom in selected_symptoms for symptom in symptoms):
-            return diagnosis_data[rule]
-    return "Tidak ada diagnosis yang sesuai"
+        if all(symptom in selected_symptoms for symptom in symptoms):  # jika semua gejala cocok
+            return diagnosis_data[rule]  # kembalikan diagnosis yang sesuai
+    return "Tidak ada diagnosis yang sesuai"  # jika tidak ada aturan yang cocok
 
-# Fungsi untuk halaman Beranda
+# Fungsi untuk halaman Beranda aplikasi
 def home_page():
     st.title("Selamat datang di Sistem Pakar Deteksi Penyakit Jantung")
     st.write("Aplikasi ini membantu mendiagnosa penyakit jantung berdasarkan gejala-gejala yang dialami.")
-    st.image("logo.png", width=800)
+    st.image("logo.png", width=800)  # Menampilkan logo aplikasi
 
 # Fungsi untuk Sistem Pakar Jantung
 def heart_disease_system():
@@ -73,35 +74,34 @@ def heart_disease_system():
 
     # Inisialisasi status checkbox di session_state jika belum ada
     if 'selected_symptoms' not in st.session_state:
-        st.session_state.selected_symptoms = []
+        st.session_state.selected_symptoms = []  # Menyimpan gejala yang dipilih di session_state
 
     # Checkbox untuk memilih gejala
     for symptom, label in symptoms_data.items():
         if symptom in st.session_state.selected_symptoms:
-            checked = True
+            checked = True  # Jika gejala sudah dipilih, centang checkbox
         else:
-            checked = False
+            checked = False  # Jika gejala belum dipilih, biarkan tidak dicentang
 
         if st.checkbox(label, value=checked, key=symptom):
             if symptom not in st.session_state.selected_symptoms:
-                st.session_state.selected_symptoms.append(symptom)
+                st.session_state.selected_symptoms.append(symptom)  # Menambahkan gejala yang dipilih
         else:
             if symptom in st.session_state.selected_symptoms:
-                st.session_state.selected_symptoms.remove(symptom)
+                st.session_state.selected_symptoms.remove(symptom)  # Menghapus gejala yang tidak dipilih
 
     # Tombol diagnosis
     if st.button("Diagnosa"):
         if st.session_state.selected_symptoms:
-            result = diagnose_heart_disease(st.session_state.selected_symptoms)
-            st.success(f"Hasil diagnosis: {result}")
+            result = diagnose_heart_disease(st.session_state.selected_symptoms)  # Memanggil fungsi diagnosis
+            st.success(f"Hasil diagnosis: {result}")  # Menampilkan hasil diagnosis
         else:
-            st.warning("Silakan pilih minimal satu gejala sebelum melanjutkan.")
+            st.warning("Silakan pilih minimal satu gejala sebelum melanjutkan.")  # Peringatan jika tidak ada gejala yang dipilih
 
     # Fitur reset
-    st.write("- klik 2 kali agar checkbox kereset")
     if st.button("Reset"): 
-        # Menghapus status checkbox
-        st.session_state.selected_symptoms = []
+        # Menghapus status checkbox dengan cara lebih sederhana
+        st.session_state.selected_symptoms.clear()
         
         # Menampilkan pesan reset
         st.success("Semua gejala telah direset!")
@@ -120,13 +120,6 @@ def about_page():
         Dengan kata lain, aplikasi ini mengalir maju dari pemilihan gejala menuju diagnosis, tanpa memerlukan penelusuran kembali atau pengujian terhadap gejala yang tidak dipilih.
     """)
     st.write("""
-        Alasan mengapa aplikasi ini dianggap menggunakan pendekatan **forward** adalah sebagai berikut:
-        
-        1. **Pengguna memilih gejala**: Pengguna memilih gejala-gejala yang mereka alami melalui checkbox.
-        2. **Menekan tombol diagnosis**: Setelah memilih gejala, pengguna menekan tombol "Diagnosa" untuk mendapatkan hasil diagnosis berdasarkan gejala yang dipilih.
-        3. **Hasil diagnosis**: Sistem memberikan hasil diagnosis setelah pengguna memilih gejala dan mengklik tombol diagnosis. Jika gejala sudah dipilih, proses ini maju ke langkah diagnosis.
-    """)
-    st.write("""
         **Cara Kerja Aplikasi**:
         
         1. **Pemilihan Gejala**: Pengguna akan melihat daftar gejala yang umum terjadi pada penyakit jantung. Pengguna dapat memilih gejala-gejala yang mereka alami melalui checkbox.
@@ -136,11 +129,13 @@ def about_page():
     """)
 
 # Main navigation with page selection
+# Pilihan menu halaman yang dapat dipilih di sidebar
 page = st.sidebar.selectbox("Pilih menu:", ["Beranda", "Sistem Pakar Jantung", "Tentang Aplikasi"])
 
+# Menampilkan halaman berdasarkan pilihan
 if page == "Beranda":
-    home_page()
+    home_page()  # Menampilkan halaman beranda
 elif page == "Sistem Pakar Jantung":
-    heart_disease_system()
+    heart_disease_system()  # Menampilkan sistem pakar untuk diagnosa penyakit jantung
 elif page == "Tentang Aplikasi":
-    about_page()
+    about_page()  # Menampilkan halaman tentang aplikasi
